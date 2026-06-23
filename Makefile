@@ -1,13 +1,14 @@
 MVNW := ./mvnw
 PROFILE ?= dev
 
-.PHONY: help run run-dev run-prod test build clean package
+.PHONY: help run run-dev run-prod run-prod-vm test build clean package
 
 help:
 	@echo "Available targets:"
 	@echo "  make run          - Start the app (default profile: dev)"
 	@echo "  make run-dev      - Start with dev profile (port 8080)"
 	@echo "  make run-prod     - Start with prod profile (port 9090)"
+	@echo "  make run-prod-vm  - Start prod profile via VM argument (lesson 56)"
 	@echo "  make run PROFILE=prod - Start with a custom profile"
 	@echo "  make test         - Run tests"
 	@echo "  make build        - Compile and package the application"
@@ -22,6 +23,9 @@ run-dev:
 
 run-prod:
 	$(MVNW) spring-boot:run -Dspring-boot.run.profiles=prod
+
+run-prod-vm:
+	$(MVNW) spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=prod"
 
 test:
 	$(MVNW) test

@@ -52,10 +52,10 @@ Stop the server with `Ctrl+C`.
 
 The app uses Spring profiles for environment-specific settings (REST URL, port, logging).
 
-| Profile | Port | REST URL (`api.base-url`) | SQL logging | H2 console |
-|---------|------|---------------------------|-------------|------------|
-| `dev` (default) | 8080 | `http://localhost:8080` | on | enabled |
-| `prod` | 9090 | `http://localhost:9090` | off | disabled |
+| Profile | Port | REST URL (`api.base-url`) | SQL logging | H2 console | App logging |
+|---------|------|---------------------------|-------------|------------|-------------|
+| `dev` (default) | 8080 | `http://localhost:8080` | on | enabled | DEBUG → console |
+| `prod` | 9090 | `http://localhost:9090` | off | disabled | INFO → `logs/product-api.log` |
 
 ### Activate a profile
 
@@ -68,6 +68,7 @@ spring.profiles.active=dev
 ```bash
 make run-dev          # dev profile, port 8080
 make run-prod         # prod profile, port 9090
+make run-prod-vm      # prod profile via VM argument (lesson 56)
 make run PROFILE=prod   # same as run-prod
 ```
 
@@ -88,6 +89,38 @@ java -jar target/core-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
 When using the `prod` profile, open the API at http://localhost:9090/api/products.
+
+## Logging (Section 9)
+
+`ProductController` uses SLF4J logging (`LoggerFactory.getLogger`). Each endpoint logs at `INFO` when a request is handled; `DEBUG` for details; `WARN` when a product is not found.
+
+| Profile | Log level (`com.example.core`) | Output |
+|---------|-------------------------------|--------|
+| `dev` | `DEBUG` | Console |
+| `prod` | `INFO` (controller only) | File: `logs/product-api.log` |
+
+**Try it** — start the app and hit the API:
+
+```bash
+make run-dev
+curl http://localhost:8080/api/products
+```
+
+You should see lines like `Fetching all products` in the console.
+
+**Prod file logging:**
+
+```bash
+make run-prod
+curl http://localhost:9090/api/products
+cat logs/product-api.log
+```
+
+**Change log level at runtime** (lesson 60) via command line:
+
+```bash
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--logging.level.com.example.core=TRACE"
+```
 
 ## Makefile commands
 
