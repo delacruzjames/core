@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${pageTitle}">Product</title>
+	<link rel="stylesheet" th:href="@{/css/products.css}">
+</head>
+<body>
+<header>
+	<h1 th:text="${product.name}">Product Name</h1>
+	<p>Single object data sent to the template</p>
+</header>
+
+<main>
+	<dl>
+		<dt>ID</dt>
+		<dd th:text="${product.id}">1</dd>
+
+		<dt>Name</dt>
+		<dd th:text="${product.name}">Laptop</dd>
+
+		<dt>Description</dt>
+		<dd th:text="${product.description}">15-inch laptop</dd>
+
+		<dt>Price</dt>
+		<dd th:text="${#numbers.formatDecimal(product.price, 1, 2)}">999.99</dd>
+	</dl>
+
+	<p>
+		<a class="button" th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+		<a class="link" th:href="@{/products}">Back to list</a>
+	</p>
+
+	<form th:action="@{/products/{id}/delete(id=${product.id})}" method="post">
+		<button type="submit" class="danger">Delete</button>
+	</form>
+</main>
+</body>
+</html>
