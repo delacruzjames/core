@@ -43,6 +43,7 @@ java -version
    ```
 
 4. **Open in browser**
+   - Product UI: http://localhost:8080/products
    - API: http://localhost:8080/api/products
    - Health: http://localhost:8080/actuator/health
    - Info: http://localhost:8080/actuator/info
@@ -186,6 +187,48 @@ curl http://localhost:9090/actuator/info
 curl http://localhost:9090/actuator/metrics
 ```
 
+## Thymeleaf templates (Section 11)
+
+Thymeleaf renders server-side HTML views for the product catalog. The REST API at `/api/products` is unchanged.
+
+| URL | Template | Purpose |
+|-----|----------|---------|
+| `/products` | `products/list.html` | List all products (`th:each`) |
+| `/products/{id}` | `products/detail.html` | Single product object |
+| `/products/new` | `products/form.html` | Create form |
+| `/products/{id}/edit` | `products/form.html` | Edit form |
+
+**MVC flow:**
+
+```
+Browser → ProductViewController (@Controller) → Model data → Thymeleaf template → HTML
+```
+
+**Dev cache disabled** (lesson 73) — template changes apply without restart:
+
+```properties
+spring.thymeleaf.cache=false
+```
+
+**Try it:**
+
+```bash
+make run-dev
+open http://localhost:8080/products
+```
+
+Use **Add Product** to submit the HTML form. The controller saves via JPA and redirects back to the list.
+
+**Key Thymeleaf syntax used:**
+
+| Syntax | Example |
+|--------|---------|
+| `th:text` | `th:text="${product.name}"` |
+| `th:each` | `th:each="product : ${products}"` |
+| `th:href` | `th:href="@{/products/{id}(id=${product.id})}"` |
+| `th:field` | `th:field="*{name}"` (form binding) |
+| `th:object` | `th:object="${product}"` |
+
 ## Makefile commands
 
 | Command | Description |
@@ -243,10 +286,13 @@ core/
     │   ├── CoreApplication.java
     │   ├── client/      # RestTemplate client
     │   ├── config/      # RestTemplate, info contributor
-    │   ├── controller/  # REST API
+    │   ├── controller/  # REST API + Thymeleaf MVC views
     │   ├── health/      # Custom health indicators
     │   ├── model/       # JPA entities
     │   └── repository/
+    ├── main/resources/
+    │   ├── templates/   # Thymeleaf HTML views
+    │   └── static/      # CSS and static assets
     └── test/            # JUnit tests
 ```
 

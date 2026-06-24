@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${pageTitle}">Product Form</title>
+	<link rel="stylesheet" th:href="@{/css/products.css}">
+</head>
+<body>
+<header>
+	<h1 th:text="${pageTitle}">Product Form</h1>
+	<p>HTML form processed by Spring MVC</p>
+</header>
+
+<main>
+	<form th:action="@{/products}" th:object="${product}" method="post" th:if="${product.id == null}">
+		<label for="name">Name</label>
+		<input id="name" type="text" th:field="*{name}" placeholder="Product name" required>
+
+		<label for="description">Description</label>
+		<textarea id="description" th:field="*{description}" placeholder="Product description"></textarea>
+
+		<label for="price">Price</label>
+		<input id="price" type="number" step="0.01" min="0" th:field="*{price}" placeholder="0.00" required>
+
+		<div class="actions">
+			<button type="submit">Save</button>
+			<a class="link" th:href="@{/products}">Cancel</a>
+		</div>
+	</form>
+
+	<form th:action="@{/products/{id}(id=${product.id})}" th:object="${product}" method="post" th:if="${product.id != null}">
+		<input type="hidden" th:field="*{id}">
+
+		<label for="edit-name">Name</label>
+		<input id="edit-name" type="text" th:field="*{name}" placeholder="Product name" required>
+
+		<label for="description">Description</label>
+		<textarea id="description" th:field="*{description}" placeholder="Product description"></textarea>
+
+		<label for="price">Price</label>
+		<input id="price" type="number" step="0.01" min="0" th:field="*{price}" placeholder="0.00" required>
+
+		<div class="actions">
+			<button type="submit">Save</button>
+			<a class="link" th:href="@{/products}">Cancel</a>
+		</div>
+	</form>
+</main>
+</body>
+</html>

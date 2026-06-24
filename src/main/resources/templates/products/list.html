@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${pageTitle}">Products</title>
+	<link rel="stylesheet" th:href="@{/css/products.css}">
+</head>
+<body>
+<header>
+	<h1 th:text="${pageTitle}">Product Catalog</h1>
+	<p>Thymeleaf view — MVC template rendering multiple records</p>
+</header>
+
+<main>
+	<p>
+		<a class="button" th:href="@{/products/new}">Add Product</a>
+		<a class="link" th:href="@{/api/products}">View JSON API</a>
+	</p>
+
+	<table th:if="${!products.isEmpty()}">
+		<thead>
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Price</th>
+			<th>Actions</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="product : ${products}">
+			<td th:text="${product.id}">1</td>
+			<td>
+				<a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}">Laptop</a>
+			</td>
+			<td th:text="${product.description}">Description</td>
+			<td th:text="${#numbers.formatDecimal(product.price, 1, 2)}">99.99</td>
+			<td>
+				<a th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+
+	<p th:if="${products.isEmpty()}">No products yet. <a th:href="@{/products/new}">Add the first one</a>.</p>
+</main>
+</body>
+</html>
