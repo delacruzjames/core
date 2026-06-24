@@ -44,6 +44,9 @@ java -version
 
 4. **Open in browser**
    - API: http://localhost:8080/api/products
+   - Health: http://localhost:8080/actuator/health
+   - Info: http://localhost:8080/actuator/info
+   - Metrics: http://localhost:8080/actuator/metrics
    - H2 console: http://localhost:8080/h2-console
 
 Stop the server with `Ctrl+C`.
@@ -122,6 +125,67 @@ cat logs/product-api.log
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--logging.level.com.example.core=TRACE"
 ```
 
+## Health checks and metrics (Section 10)
+
+Spring Boot Actuator exposes operational endpoints for monitoring the app.
+
+| Endpoint | URL (dev) | Purpose |
+|----------|-----------|---------|
+| Health | `/actuator/health` | App and dependency status |
+| Info | `/actuator/info` | App metadata and build info |
+| Metrics | `/actuator/metrics` | JVM and app metrics |
+| Env | `/actuator/env` | Environment properties (dev only) |
+
+### Profile settings
+
+| Profile | Exposed endpoints | Health details |
+|---------|-------------------|----------------|
+| `dev` | health, info, metrics, env | always shown |
+| `prod` | health, info, metrics | hidden |
+
+### Custom health check
+
+`ProductHealthIndicator` checks the product database and reports how many products exist:
+
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+Example response (dev):
+
+```json
+{
+  "status": "UP",
+  "components": {
+    "product": {
+      "status": "UP",
+      "details": {
+        "products": 2,
+        "message": "Product database is reachable"
+      }
+    }
+  }
+}
+```
+
+### Build info and custom info endpoint
+
+Maven generates build metadata (`build.version`, `build.time`, etc.) via the `build-info` goal.
+
+`CoreInfoContributor` adds custom fields like `activeProfiles` and `api`.
+
+```bash
+curl http://localhost:8080/actuator/info
+```
+
+**Prod** (port 9090):
+
+```bash
+curl http://localhost:9090/actuator/health
+curl http://localhost:9090/actuator/info
+curl http://localhost:9090/actuator/metrics
+```
+
 ## Makefile commands
 
 | Command | Description |
@@ -178,8 +242,9 @@ core/
     ├── main/java/com/example/core/
     │   ├── CoreApplication.java
     │   ├── client/      # RestTemplate client
-    │   ├── config/
+    │   ├── config/      # RestTemplate, info contributor
     │   ├── controller/  # REST API
+    │   ├── health/      # Custom health indicators
     │   ├── model/       # JPA entities
     │   └── repository/
     └── test/            # JUnit tests
