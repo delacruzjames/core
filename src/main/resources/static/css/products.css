@@ -56,11 +56,23 @@ label {
 	font-weight: 600;
 }
 
-input, textarea {
+input, textarea, select {
 	padding: 0.5rem;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	font: inherit;
+}
+
+section {
+	margin: 2rem 0;
+}
+
+.notice.success {
+	background: #e6f4ea;
+	border: 1px solid #34a853;
+	color: #137333;
+	padding: 0.75rem 1rem;
+	border-radius: 4px;
 }
 
 .actions {

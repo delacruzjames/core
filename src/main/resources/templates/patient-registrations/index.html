@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${pageTitle}">Patient Registration</title>
+	<link rel="stylesheet" th:href="@{/css/products.css}">
+</head>
+<body>
+<header>
+	<h1 th:text="${pageTitle}">Patient Registration</h1>
+	<p>Loosely coupled messaging — Registration sends a JMS message; Clinicals receives it via ActiveMQ</p>
+</header>
+
+<main>
+	<p class="notice success" th:if="${successMessage}" th:text="${successMessage}">Success</p>
+
+	<section>
+		<h2>Register a patient</h2>
+		<form th:action="@{/patient-registrations}" th:object="${registration}" method="post">
+			<label for="patientId">Patient ID</label>
+			<input id="patientId" type="text" th:field="*{patientId}" placeholder="Leave blank to auto-generate">
+
+			<label for="patientName">Patient name</label>
+			<input id="patientName" type="text" th:field="*{patientName}" placeholder="Jane Doe" required>
+
+			<label for="registrationType">Registration type</label>
+			<select id="registrationType" th:field="*{registrationType}" required>
+				<option value="">Select type</option>
+				<option value="NEW_PATIENT">New patient</option>
+				<option value="FOLLOW_UP">Follow-up</option>
+				<option value="EMERGENCY">Emergency</option>
+			</select>
+
+			<div class="actions">
+				<button type="submit">Send to ActiveMQ</button>
+			</div>
+		</form>
+	</section>
+
+	<section>
+		<h2>Received by Patient Clinicals</h2>
+		<p>Messages consumed asynchronously by the <code>@JmsListener</code> in this app.</p>
+
+		<table th:if="${!receivedMessages.isEmpty()}">
+			<thead>
+			<tr>
+				<th>Patient ID</th>
+				<th>Name</th>
+				<th>Type</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr th:each="message : ${receivedMessages}">
+				<td th:text="${message.patientId}">P-1001</td>
+				<td th:text="${message.patientName}">Jane Doe</td>
+				<td th:text="${message.registrationType}">NEW_PATIENT</td>
+			</tr>
+			</tbody>
+		</table>
+
+		<p th:if="${receivedMessages.isEmpty()}">No messages received yet. Submit the form above to test JMS.</p>
+	</section>
+
+	<p>
+		<a class="link" th:href="@{/api/patient-registrations}">JSON API (POST only)</a>
+		·
+		<a class="link" th:href="@{/products}">Products</a>
+	</p>
+</main>
+</body>
+</html>
