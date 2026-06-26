@@ -1,7 +1,7 @@
 package com.example.core.controller;
 
 import com.example.core.model.Product;
-import com.example.core.repository.ProductRepository;
+import com.example.core.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +22,16 @@ public class ProductController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
-	private final ProductRepository productRepository;
+	private final ProductService productService;
 
-	public ProductController(ProductRepository productRepository) {
-		this.productRepository = productRepository;
+	public ProductController(ProductService productService) {
+		this.productService = productService;
 	}
 
 	@GetMapping
 	public List<Product> getAllProducts() {
 		LOGGER.info("Fetching all products");
-		List<Product> products = productRepository.findAll();
+		List<Product> products = productService.findAll();
 		LOGGER.debug("Found {} products", products.size());
 		return products;
 	}
@@ -39,7 +39,7 @@ public class ProductController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Product> getProduct(@PathVariable Long id) {
 		LOGGER.info("Fetching product with id: {}", id);
-		return productRepository.findById(id)
+		return productService.findById(id)
 				.map(product -> {
 					LOGGER.debug("Product found: {}", product.getName());
 					return ResponseEntity.ok(product);
@@ -53,7 +53,7 @@ public class ProductController {
 	@PostMapping
 	public Product createProduct(@RequestBody Product product) {
 		LOGGER.info("Creating product: {}", product.getName());
-		Product saved = productRepository.save(product);
+		Product saved = productService.save(product);
 		LOGGER.debug("Created product with id: {}", saved.getId());
 		return saved;
 	}
@@ -61,12 +61,12 @@ public class ProductController {
 	@PutMapping("/{id}")
 	public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
 		LOGGER.info("Updating product with id: {}", id);
-		return productRepository.findById(id)
+		return productService.findById(id)
 				.map(product -> {
 					product.setName(productDetails.getName());
 					product.setDescription(productDetails.getDescription());
 					product.setPrice(productDetails.getPrice());
-					Product updated = productRepository.save(product);
+					Product updated = productService.update(product);
 					LOGGER.debug("Updated product: {}", updated.getName());
 					return ResponseEntity.ok(updated);
 				})
@@ -79,11 +79,11 @@ public class ProductController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
 		LOGGER.info("Deleting product with id: {}", id);
-		if (!productRepository.existsById(id)) {
+		if (!productService.existsById(id)) {
 			LOGGER.warn("Product not found for delete with id: {}", id);
 			return ResponseEntity.notFound().build();
 		}
-		productRepository.deleteById(id);
+		productService.deleteById(id);
 		LOGGER.debug("Deleted product with id: {}", id);
 		return ResponseEntity.noContent().build();
 	}
